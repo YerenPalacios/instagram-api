@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-!c!$svu#7v4=iuykp%4r0i8_as76g@6wf_-$h+eq)m&z3(z8jb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
 
 # Application definition
@@ -40,10 +44,12 @@ INSTALLED_APPS = [
     "debug_toolbar",
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'instagram_app'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -131,7 +137,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'instagram_app.User'
 
-MEDIA_ROOT = 'media'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+MEDIA_URL = ''
 
 INTERNAL_IPS = [
     "127.0.0.1",
