@@ -12,7 +12,7 @@ GET http://localhost:8000/post/
 Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
 
 
-###
+### 
 POST http://localhost:8000/logout/
 Authorization: Token abf70d6fdb40d09fd4f988319e5706dd048bfb93
 
@@ -27,16 +27,35 @@ Content-Type: application/json
 
 
 ###
-POST https://api.example.com/user/upload
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+GET http://localhost:8000/like/
+Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
 
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="text"
+###
+POST http://localhost:8000/like/
+Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
+Content-Type: application/json
 
-title
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="image"; filename="1.png"
-Content-Type: image/png
+{
+    "post": 2
+}
 
-< ./1.png
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
+###
+POST http://localhost:8000/comment/
+Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
+Content-Type: application/json
+
+{
+    "post": 2,
+    "text": "added comment"
+}
+
+
+###
+GET http://localhost:8000/comment/
+Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
+
+
+
+###
+GET http://localhost:8000/profile-stories/
+Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
