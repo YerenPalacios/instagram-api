@@ -10,6 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User()
         exclude = ('user_permissions', 'groups','is_staff', 'password',)
+        read_only_fields = ('name',)
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User()
+        fields = ('username', 'email')
 
 
 class LoginSerializer(serializers.Serializer):
@@ -62,4 +69,4 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 class ProfileStoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = User()
-        fields = ['id','name','image']
+        fields = ['id','username','image']

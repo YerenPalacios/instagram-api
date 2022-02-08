@@ -1,11 +1,11 @@
 from rest_framework.response import Response
-from rest_framework.generics import  ListAPIView, GenericAPIView, ListCreateAPIView, CreateAPIView, RetrieveAPIView
+from rest_framework.generics import  ListAPIView, GenericAPIView, ListCreateAPIView, CreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 
 from instagram_app.models import User
 from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer
-from instagram_app.serializers.user import UserSignUpSerializer
+from instagram_app.serializers.user import UserSignUpSerializer, UserUpdateSerializer
 
 
 class UserView(ListCreateAPIView):
@@ -13,9 +13,10 @@ class UserView(ListCreateAPIView):
     queryset = serializer_class.Meta.model.objects.all()
 
 
-class UserDetailView(RetrieveAPIView):
+class UserDetailView(RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     queryset = serializer_class.Meta.model.objects.all()
+    lookup_field = 'username'
 
 
 class UserSignupView(CreateAPIView):
