@@ -12,7 +12,9 @@ class PostsView(ListCreateAPIView):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        queryset = self.serializer_class.Meta.model.objects.prefetch_related(
+        queryset = self.serializer_class.Meta.model.objects.exclude(
+            user = self.request.user
+        ).prefetch_related(
             Prefetch('likes', queryset=Like.objects.filter(user=self.request.user)), 
             Prefetch(
                 'comments',
