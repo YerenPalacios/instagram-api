@@ -55,7 +55,7 @@ GET http://localhost:8000/like/
 Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
 
 ###
-POST http://localhost:8000/like/
+POST http://localhost:3001/like/
 Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
 Content-Type: application/json
 
