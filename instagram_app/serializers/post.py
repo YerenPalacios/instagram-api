@@ -31,6 +31,12 @@ class PostSerializer(serializers.ModelSerializer):
     def get_likes(self, obj):
         return obj.likes.all().count()
 
+    def create(self, validated_data):
+
+        instance = self.Meta.model(**validated_data)
+
+        return instance
+
 
     class Meta:
         model = Post
