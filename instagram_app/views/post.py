@@ -8,7 +8,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.db.models import Prefetch
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from instagram_app.models import Images, Comment, Like
 from instagram_app.serializers import PostSerializer
@@ -46,7 +46,6 @@ def to_file(file_from_POST):
   
 class PostsView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
-    # parser_classes = (MultiPartParser,FormParser)
     serializer_class = PostSerializer
 
     def get_queryset(self):
@@ -82,3 +81,11 @@ class PostsView(ListCreateAPIView):
         post = self.serializer_class(post).data
 
         return Response(post, status=201)
+
+
+class PostDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PostSerializer
+    queryset = serializer_class.Meta.model.objects.select_related(
+        'user'
+    ).prefetch_related('images', 'comments', 'likes')
