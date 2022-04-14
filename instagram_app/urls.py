@@ -1,5 +1,5 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
+from instagram_app.views.message import MessageView
 from instagram_app.views.user import (
     UserDetailView, UserView, ProfileStoriesView, LoginView, LogoutView, UserSignupView
 )
@@ -22,4 +22,6 @@ urlpatterns = [
     path('like/', LikeView.as_view()),
 
     path('comment/', CommentView.as_view()),
+
+    path('message/', MessageView.as_view())
 ]

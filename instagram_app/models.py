@@ -2,25 +2,26 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.db.models.fields.related import ForeignKey
+from django.dispatch import receiver
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, name, email, password = None):
+    def create_user(self, name, email, password=None):
         if not email:
             raise ValueError('Email must be provided')
-        
+
         email = self.normalize_email(email)
-        user = self.model(name=name,email=email)
+        user = self.model(name=name, email=email)
         user.set_password(password)
         user.save()
-        
+
         return user
 
     def create_superuser(self, email, name, password):
-        user = self.create_user(email = email,name = name, password= password)
+        user = self.create_user(email=email, name=name, password=password)
         user.is_superuser = True
         user.is_staff = True
-        user.save(using = self._db)
+        user.save(using=self._db)
 
         return user
 
@@ -39,9 +40,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
 
-
     def __str__(self):
-        return self.email
+        return f'{self.email}: {self.username}'
+
 
 class Post(models.Model):
     created_at = models.DateTimeField(auto_now=True)
@@ -49,26 +50,40 @@ class Post(models.Model):
     text = models.TextField(max_length=500)
 
 
-
 class Images(models.Model):
-    image = models.ImageField(upload_to='uploads/posts',blank=True, null=True)
+    image = models.ImageField(upload_to='uploads/posts', blank=True, null=True)
     post = ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
 
 
 class Comment(models.Model):
     text = models.CharField(max_length=500)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
-    parent = models.ForeignKey('Comment', blank=True, null=True, on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, related_name='comments', on_delete=models.CASCADE)
+    parent = models.ForeignKey(
+        'Comment', blank=True, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
+
+
+class Message(models.Model):
+    text = models.CharField(max_length=1000)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    send_to = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="send_to")
 
 
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post,related_name='likes', on_delete=models.CASCADE, blank=True, null=True)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True, null=True)
+    post = models.ForeignKey(Post, related_name='likes',
+                             on_delete=models.CASCADE, blank=True, null=True)
+    comment = models.ForeignKey(
+        Comment, on_delete=models.CASCADE, blank=True, null=True)
+    message = models.ForeignKey(
+        Message, on_delete=models.CASCADE, blank=True, null=True)
+
 
 class Follow(models.Model):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower')
-    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    follower = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='follower')
+    following = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='following')
     created_at = models.DateTimeField(auto_now=True)
