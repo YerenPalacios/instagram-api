@@ -83,3 +83,14 @@ Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
 ###
 GET http://localhost:8000/profile-stories/
 Authorization: Token 40e6be31c22dbde51b4982037b71da60adb45d9f
+
+
+###
+GET http://localhost:3001/chatlist/
+Authorization: Token 370be037a266fa217589a337213c928a318dd1ac
+# Content-Type: application/json
+
+# {
+#     "text":"hola",
+#     "send_to":2
+# }

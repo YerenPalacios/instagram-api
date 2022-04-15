@@ -69,6 +69,7 @@ class Message(models.Model):
     text = models.CharField(max_length=1000)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     send_to = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="send_to")
+    created_at = models.DateTimeField(auto_now=True)
 
 
 class Like(models.Model):

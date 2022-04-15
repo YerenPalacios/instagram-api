@@ -1,8 +1,11 @@
 from django.core.validators import RegexValidator ,FileExtensionValidator
 from django.contrib.auth import get_user_model as User, authenticate
+from django.db.models import Q
 from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from rest_framework import serializers
+
+from instagram_app.serializers.message import MessageSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,6 +15,18 @@ class UserSerializer(serializers.ModelSerializer):
         exclude = ('user_permissions', 'groups','is_staff', 'password',)
         read_only_fields = ('name',)
 
+
+class UserChattingSerializer(UserSerializer):
+    last_message = serializers.SerializerMethodField()
+
+    def get_last_message(self, obj):
+        model = MessageSerializer.Meta.model
+        return MessageSerializer(
+            model.objects.filter(
+                Q(user=obj) & Q(send_to=self.context['user']) | 
+                Q(user=self.context['user']) & Q(send_to=obj)
+            ).order_by('-created_at').first()
+        ).data
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:

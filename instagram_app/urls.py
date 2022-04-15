@@ -1,5 +1,5 @@
 from django.urls import path
-from instagram_app.views.message import MessageView
+from instagram_app.views.message import MessageView, ChatListView
 from instagram_app.views.user import (
     UserDetailView, UserView, ProfileStoriesView, LoginView, LogoutView, UserSignupView
 )
@@ -12,7 +12,7 @@ urlpatterns = [
     path('user/', UserView.as_view()),
     path('user/<str:username>', UserDetailView.as_view()),
     path('sign-up/', UserSignupView.as_view()),
-    path('login/', LoginView.as_view()),  
+    path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
     path('profile-stories/', ProfileStoriesView.as_view()),
 
@@ -23,5 +23,6 @@ urlpatterns = [
 
     path('comment/', CommentView.as_view()),
 
-    path('message/', MessageView.as_view())
+    path('message/', MessageView.as_view()),
+    path('chatlist/', ChatListView.as_view()),
 ]
