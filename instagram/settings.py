@@ -95,9 +95,17 @@ WSGI_APPLICATION = 'instagram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+		'ENGINE': 'django.db.backends.postgresql_psycopg2',
+		'NAME': 'instagram_db',
+		'USER' : 'postgres',
+		'PASSWORD' : '1234',
+		'HOST' : 'localhost', #si tienes otra dirección host debes remplazar esta
+		'PORT' : '5432', #si lo dejas vacío tomara el puerto por default
+	},
+    # 'test': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
 }
 
 STATIC_HOST = "https://dry-brook-25412.herokuapp.com/" if not DEBUG else ""
