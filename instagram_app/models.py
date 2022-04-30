@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.fields.related import ForeignKey
 from django.dispatch import receiver
@@ -88,3 +89,42 @@ class Follow(models.Model):
     following = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='following')
     created_at = models.DateTimeField(auto_now=True)
+
+class PublicChatRoom(models.Model):
+    title = models.CharField(max_length=255, unique=True, blank=False)
+    user = models.ManyToManyField(get_user_model(), blank=True)
+
+    def connect_user(self, user):
+        is_user_added = False
+        if user not in self.users.all():
+            self.users.add(user)
+            self.save()
+            is_user_added = False
+        else:
+            is_user_added = False
+        return is_user_added
+
+    def disconnet_user(self, user):
+        is_user_removed = False
+        if user in self.users.all():
+            self.users.remove(user)
+            self.save()
+            is_user_removed = True
+        return is_user_removed
+
+    @property
+    def group_name(self):
+        return f'PublicChatRoom-{self.id}'
+
+class PublicChatRoomMessageManager(models.Manager):
+    def by_room(self, room):
+        return self.model.objects.filter(room=room).order_by('-timestamp')
+
+class PublicChatRoomMessage(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    room = models.ForeignKey(PublicChatRoom, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.content
