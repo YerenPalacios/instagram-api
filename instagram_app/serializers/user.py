@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from rest_framework import serializers
 
-from instagram_app.serializers.message import MessageSerializer
+from instagram_app.serializers.message import MessageSerializer, ChatRoomMessageSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,17 +16,21 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('name',)
 
 
-class UserChattingSerializer(UserSerializer):
+class UserChattingSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    user = serializers.SerializerMethodField()
     last_message = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        user =  obj.users.exclude(id = self.context['user'].id)[0]
+        return UserSerializer(user).data
 
     def get_last_message(self, obj):
         model = MessageSerializer.Meta.model
-        return MessageSerializer(
-            model.objects.filter(
-                Q(user=obj) & Q(send_to=self.context['user']) | 
-                Q(user=self.context['user']) & Q(send_to=obj)
-            ).order_by('-created_at').first()
+        a= ChatRoomMessageSerializer(
+            obj.chatroommessage_set.first()
         ).data
+        return a
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
