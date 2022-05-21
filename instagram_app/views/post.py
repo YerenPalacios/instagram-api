@@ -53,9 +53,7 @@ class PostsView(ListCreateAPIView):
             Prefetch('likes', queryset=Like.objects.filter(user=self.request.user)), 
             Prefetch(
                 'comments',
-                queryset=Comment.objects.filter(
-                    user=self.request.user
-                ).select_related('user')
+                queryset=Comment.objects.select_related('user')
             ),
             'images'
         ).order_by('-created_at')

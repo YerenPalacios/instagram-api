@@ -89,3 +89,11 @@ class ProfileStoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = User()
         fields = ['id','username','image']
+
+
+class UserProfileSerializer(UserSerializer):
+    
+    posts_count = serializers.SerializerMethodField()
+
+    def get_posts_count(self, obj):
+        return obj.post_set.count()

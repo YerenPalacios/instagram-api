@@ -31,6 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=30)
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(max_length=50, unique=True)
+    description = models.TextField(max_length=500, blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     image = models.ImageField(upload_to='uploads', null=True)
     is_active = models.BooleanField(default=True)
