@@ -1,3 +1,3 @@
-web: gunicorn instagram.wsgi:application
+web: gunicorn instagram.asgi:application
 python manage.py collectstatic --noinput
 python manage.py migrate
