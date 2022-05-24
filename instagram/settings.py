@@ -14,10 +14,17 @@ from pathlib import Path
 import dj_database_url
 import django_heroku
 import os
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
@@ -96,11 +103,24 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [
+                "redis://:p8e147a00e588f5d8318fd9aa50511b4f350360f64bfab100e79d8e9dc1dfef08@ec2-3-230-252-194.compute-1.amazonaws.com:30820",
+                # ('127.0.0.1', 6379)],
+            ],
+            "symmetric_encryption_keys": [SECRET_KEY],
         },
     },
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": 'redis://:p8e147a00e588f5d8318fd9aa50511b4f350360f64bfab100e79d8e9dc1dfef08@ec2-3-230-252-194.compute-1.amazonaws.com:30820',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
