@@ -106,6 +106,7 @@ class ChatConsumer2(JsonWebsocketConsumer):
         self.chat_id = self.scope['cookies'].get('chat-id')
 
         # Join chat
+        print('despues de aqui falla')
         async_to_sync(self.channel_layer.group_add)(
             self.chat_id,
             self.channel_name
