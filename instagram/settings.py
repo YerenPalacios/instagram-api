@@ -24,6 +24,8 @@ env = environ.Env(
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env.read_env(os.path.join(BASE_DIR,'.heroku.env'))
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Quick-start development settings - unsuitable for production
@@ -37,11 +39,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000'
 ]
 
 WHITENOISE_USE_FINDERS = True
+
+# CSRF
+CSRF_TRUSTED_ORIGINS = ['https://instagram-9.herokuapp.com']
 
 
 # Application definition
@@ -97,28 +103,28 @@ TEMPLATES = [
 WSGI_APPLICATION = 'instagram.wsgi.application'
 ASGI_APPLICATION = 'instagram.asgi.application'
 
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [
-                "redis://:p8e147a00e588f5d8318fd9aa50511b4f350360f64bfab100e79d8e9dc1dfef08@ec2-3-230-252-194.compute-1.amazonaws.com:30820",
-                # ('127.0.0.1', 6379)],
+                REDIS_URL
             ],
-            "symmetric_encryption_keys": [SECRET_KEY],
         },
     },
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": 'redis://:p8e147a00e588f5d8318fd9aa50511b4f350360f64bfab100e79d8e9dc1dfef08@ec2-3-230-252-194.compute-1.amazonaws.com:30820',
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": REDIS_URL,
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -129,8 +135,9 @@ DATABASES = {
 		'NAME': 'instagram_db',
 		'USER' : 'postgres',
 		'PASSWORD' : '1234',
-		'HOST' : 'localhost', #si tienes otra dirección host debes remplazar esta
-		'PORT' : '5432', #si lo dejas vacío tomara el puerto por default
+		'HOST' : 'localhost',
+		'PORT' : '5432',
+        'CONN_MAX_AGE': 500
 	},
     # 'test': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -138,8 +145,9 @@ DATABASES = {
     # }
 }
 
-STATIC_HOST = "https://dry-brook-25412.herokuapp.com/" if not DEBUG else ""
-STATIC_URL = os.path.join(STATIC_HOST + "/static/")
+STATIC_HOST = env.str('STATIC_HOST') if not DEBUG else ""
+STATIC_URL = os.path.join(STATIC_HOST, "static")
+
 
 
 # Password validation

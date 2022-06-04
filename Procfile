@@ -1,2 +1,2 @@
-web: daphne instagram.asgi:application --port 80 --bind 0.0.0.0 -v2
-worker: python manage.py runworker --settings=instagram.settigns -v2
+web: daphne instagram.asgi:application --port $PORT --bind 0.0.0.0 -v2
+worker: python manage.py runworker channels --settings=instagram.settings -v2
