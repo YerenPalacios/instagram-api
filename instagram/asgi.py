@@ -1,14 +1,13 @@
 # mysite/asgi.py
 import os
 import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'websocket_demo.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'instagram.settings')
 django.setup()
 
 
 from django.core.asgi import get_asgi_application
 from chat import routing
 import channels
-import django
 
 channel_layer = channels.layers.get_channel_layer()
 
