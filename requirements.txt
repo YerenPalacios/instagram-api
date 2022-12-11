@@ -5,6 +5,6 @@ pillow
 django-heroku==0.3
 django-cors-headers==3.11.0
 django-debug-toolbar
-psycopg2-binary==2.9.3
+psycopg2-binary==2.9.5
 channels==3.0.4
-channels-redis==3.4.0
+channels-redis==4.0.0
