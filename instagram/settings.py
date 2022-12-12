@@ -14,17 +14,10 @@ from pathlib import Path
 import dj_database_url
 import django_heroku
 import os
-import environ
-
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, False)
-)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env.read_env(os.path.join(BASE_DIR,'.heroku.env'))
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
@@ -39,15 +32,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000'
 ]
 
 WHITENOISE_USE_FINDERS = True
-
-# CSRF
-CSRF_TRUSTED_ORIGINS = ['https://instagram-9.herokuapp.com']
 
 
 # Application definition
@@ -103,28 +92,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'instagram.wsgi.application'
 ASGI_APPLICATION = 'instagram.asgi.application'
 
-REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
-
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [
-                REDIS_URL
-            ],
+            "hosts": [('127.0.0.1', 6379)],
         },
     },
 }
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": REDIS_URL,
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -135,9 +111,8 @@ DATABASES = {
 		'NAME': 'instagram_db',
 		'USER' : 'postgres',
 		'PASSWORD' : '1234',
-		'HOST' : 'localhost',
-		'PORT' : '5432',
-        'CONN_MAX_AGE': 500
+		'HOST' : 'localhost', #si tienes otra dirección host debes remplazar esta
+		'PORT' : '5432', #si lo dejas vacío tomara el puerto por default
 	},
     # 'test': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -145,9 +120,8 @@ DATABASES = {
     # }
 }
 
-STATIC_HOST = env.str('STATIC_HOST') if not DEBUG else ""
-STATIC_URL = os.path.join(STATIC_HOST, "static")
-
+STATIC_HOST = "https://dry-brook-25412.herokuapp.com/" if not DEBUG else ""
+STATIC_URL = os.path.join(STATIC_HOST + "/static/")
 
 
 # Password validation
