@@ -26,9 +26,8 @@ class UserChattingSerializer(serializers.Serializer):
         return UserSerializer(user).data
 
     def get_last_message(self, obj):
-        model = MessageSerializer.Meta.model
         a= ChatRoomMessageSerializer(
-            obj.chatroommessage_set.first()
+            obj.chatroommessage_set.last()
         ).data
         return a
 
@@ -74,6 +73,8 @@ class UserSignUpSerializer(serializers.ModelSerializer):
     )
     
     def create(self, validated_data:dict):
+        if not validated_data.get('image'):
+            validated_data['image'] = None
         password = validated_data.pop('password') 
         user = self.Meta.model.objects.create(**validated_data)
         user.set_password(password)

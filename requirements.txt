@@ -1,8 +1,9 @@
+# sudo apt install python3-dev libpq-dev
 gunicorn==20.1.0
 django
 django-rest-framework
 pillow
-django-heroku==0.3
+django-on-heroku==1.1.2
 django-cors-headers==3.11.0
 django-debug-toolbar
 psycopg2-binary==2.9.5
