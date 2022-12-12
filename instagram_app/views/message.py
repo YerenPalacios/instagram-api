@@ -1,10 +1,12 @@
+from rest_framework.generics import get_object_or_404
 from rest_framework.generics import ListCreateAPIView
-from rest_framework.views import APIView
-from django.db.models import Q, OuterRef, Prefetch,Count
+from django.db.models import Q, Count
 from rest_framework.response import Response
-from instagram_app.serializers.message import MessageSerializer
-from instagram_app.serializers.user import UserChattingSerializer, UserSerializer
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model as User
 
+from instagram_app.serializers.message import MessageSerializer
+from instagram_app.serializers.user import UserChattingSerializer
 
 class MessageView(ListCreateAPIView):
     serializer_class = MessageSerializer
@@ -27,10 +29,31 @@ class MessageView(ListCreateAPIView):
 
 from chat.models import * 
 
-class ChatListView(APIView):
+class ChatListView(ListCreateAPIView):
+    queryset = ChatRoom.objects.all()
+    serializer_class = UserChattingSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        user = self.request.auth.user
+        chatting_user = get_object_or_404(User(), username=request.data.get('username'))
+        users = [user, chatting_user]
+
+        created_room = self.request.auth.user.chatroom_set.annotate(
+            users_count=Count('users')
+        ).filter(users_count=2, users__in=users)
+
+        if not created_room:
+            room = ChatRoom.objects.create()
+            room.users.set(users)
+            room.save()
+
+        return Response(status=201)
 
     def get(self, request):
-        rooms = ChatRoom.objects.annotate(users_count=Count('users')).filter(users_count=2, users=request.user)
+        rooms = self.get_queryset().annotate(
+            users_count=Count('users'),
+        ).filter(users_count=2, users=request.user)
         
-        data = UserChattingSerializer(rooms,many=True, context={"user": request.user}).data
+        data = self.serializer_class(rooms,many=True, context={"user": request.user}).data
         return Response(data)
