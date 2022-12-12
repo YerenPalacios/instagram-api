@@ -24,5 +24,5 @@ urlpatterns = [
     path('comment/', CommentView.as_view()),
 
     path('message/', MessageView.as_view()),
-    path('chatlist/', ChatListView.as_view()),
+    path('chatlist/', ChatListView.as_view())
 ]

@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 
 from instagram_app.models import User
-from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer,UserProfileSerializer
+from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer
 from instagram_app.serializers.user import UserSignUpSerializer, UserUpdateSerializer
 
 
@@ -14,7 +14,7 @@ class UserView(ListCreateAPIView):
 
 
 class UserDetailView(RetrieveUpdateAPIView):
-    serializer_class = UserProfileSerializer
+    serializer_class = UserSerializer
     queryset = serializer_class.Meta.model.objects.all()
     lookup_field = 'username'
 
