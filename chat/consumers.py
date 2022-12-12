@@ -2,10 +2,8 @@
 import json
 import logging
 
-from django.db.models import Q
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer, WebsocketConsumer
-from channels.consumer import SyncConsumer
 
 from instagram_app.serializers.message import MessageSerializer, ChatRoomMessageSerializer
 from chat.models import *
@@ -82,10 +80,6 @@ class ChatConsumer2(JsonWebsocketConsumer):
     available_actions = ['get_messages', 'add_message']
     chat_room = None
 
-    def update_headers(self):
-        b_headers = dict(self.scope['headers'])
-        self.scope['headers'] = {k.decode('utf-8'): b_headers.get(k).decode('utf-8') for k in b_headers}
-
     def set_user(self):
         auth = self.scope['cookies'].get('Authorization')
         if auth:
@@ -99,11 +93,16 @@ class ChatConsumer2(JsonWebsocketConsumer):
         else:
             raise
 
+    def get_chat_id(self):
+        qs = self.scope.get('query_string')
+        room_id = int(qs.replace(b'room_id=',b''))
+        return str(room_id)
+
     def connect(self):
-        self.update_headers()
         self.set_user()
 
-        self.chat_id = self.scope['cookies'].get('chat-id')
+        self.chat_id = self.get_chat_id()
+        
 
         # Join chat
         async_to_sync(self.channel_layer.group_add)(
@@ -114,26 +113,9 @@ class ChatConsumer2(JsonWebsocketConsumer):
         self.accept()
         self.get_messages()
 
-    # def receive(self, event):
-    #     data = json.loads(event['text'])
-        
-
-    #     if data['action'] == 'get_messages':
-    #         initial_messages = get_messages(self.scope['user'], data['send_to'])
-
-    #         self.send({
-    #             "type": "websocket.send",
-    #             "text": json.dumps(MessageSerializer(initial_messages, many=True).data),
-    #         })
-    #     elif data['action'] == 'add_message':
-    #         saved_message = save_message(data['text'], self.scope['user'])
-    #         self.send({
-    #             "type": "websocket.send",
-    #             "text": json.dumps(saved_message),
-    #         })
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name,
+            self.chat_id,
             self.channel_name
         )
 
@@ -176,7 +158,9 @@ class ChatConsumer2(JsonWebsocketConsumer):
         self.send_json(data)
 
     def get_messages(self):
-        room = ChatRoom.objects.get(id=self.scope['cookies'].get('chat-id'))
+        room = ChatRoom.objects.get(id=self.get_chat_id())
         self.scope['room'] = room
+        print(room)
         messages = ChatRoomMessageSerializer(room.chatroommessage_set.all(), many=True).data
         self.send_json({'type':'get_messages','data':messages})
+        
