@@ -1,11 +1,11 @@
-from django.core.validators import RegexValidator ,FileExtensionValidator
+from django.core.validators import FileExtensionValidator
 from django.contrib.auth import get_user_model as User, authenticate
-from django.db.models import Q
 from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from rest_framework import serializers
+from instagram_app.models import Follow
 
-from instagram_app.serializers.message import MessageSerializer, ChatRoomMessageSerializer
+from instagram_app.serializers.message import ChatRoomMessageSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -90,3 +90,48 @@ class ProfileStoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = User()
         fields = ['id','username','image']
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    following = serializers.SerializerMethodField()
+    
+    def get_followers_count(self, obj):
+        return obj.following.count()
+
+    def get_following_count(self, obj):
+        return obj.follower.count()
+
+    def get_following(self, obj):
+        return True if obj.following.filter(
+            follower=self.context['request'].user
+        ) else False
+
+    class Meta:
+        model = User()
+        fields = [
+            'id',
+            'name',
+            'email',
+            'image',
+            'username',
+            'following',
+            'description',
+            'followers_count',
+            'following_count'
+        ]
+
+
+class FollowUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Follow
+        fields = ['following']
+
+    def create(self, data):
+        user = self.context['request'].user
+        return Follow.objects.create(
+            follower = user,
+            following = data['following']
+        )

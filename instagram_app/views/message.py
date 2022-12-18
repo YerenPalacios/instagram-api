@@ -1,3 +1,4 @@
+from chat.models import *
 from rest_framework.generics import get_object_or_404
 from rest_framework.generics import ListCreateAPIView
 from django.db.models import Q, Count
@@ -7,6 +8,7 @@ from django.contrib.auth import get_user_model as User
 
 from instagram_app.serializers.message import MessageSerializer
 from instagram_app.serializers.user import UserChattingSerializer
+
 
 class MessageView(ListCreateAPIView):
     serializer_class = MessageSerializer
@@ -27,7 +29,6 @@ class MessageView(ListCreateAPIView):
         serializer = self.serializer_class(self.get_queryset(), many=True)
         return Response(serializer.data, status=201)
 
-from chat.models import * 
 
 class ChatListView(ListCreateAPIView):
     queryset = ChatRoom.objects.all()
@@ -36,7 +37,8 @@ class ChatListView(ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         user = self.request.auth.user
-        chatting_user = get_object_or_404(User(), username=request.data.get('username'))
+        chatting_user = get_object_or_404(
+            User(), username=request.data.get('username'))
         users = [user, chatting_user]
 
         created_room = self.request.auth.user.chatroom_set.annotate(
@@ -48,12 +50,13 @@ class ChatListView(ListCreateAPIView):
             room.users.set(users)
             room.save()
 
-        return Response(status=201)
+        return Response({}, status=201)
 
     def get(self, request):
         rooms = self.get_queryset().annotate(
             users_count=Count('users'),
         ).filter(users_count=2, users=request.user)
-        
-        data = self.serializer_class(rooms,many=True, context={"user": request.user}).data
+
+        data = self.serializer_class(rooms, many=True, context={
+                                     "user": request.user}).data
         return Response(data)

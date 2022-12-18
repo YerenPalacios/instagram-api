@@ -1,11 +1,11 @@
 from rest_framework.response import Response
-from rest_framework.generics import  ListAPIView, GenericAPIView, ListCreateAPIView, CreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import ListAPIView, GenericAPIView, ListCreateAPIView, CreateAPIView, DestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 
-from instagram_app.models import User
+from instagram_app.models import Follow, User
 from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer
-from instagram_app.serializers.user import UserSignUpSerializer, UserUpdateSerializer
+from instagram_app.serializers.user import FollowUserSerializer, UserDetailSerializer, UserSignUpSerializer, UserUpdateSerializer
 
 
 class UserView(ListCreateAPIView):
@@ -14,9 +14,12 @@ class UserView(ListCreateAPIView):
 
 
 class UserDetailView(RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
     queryset = serializer_class.Meta.model.objects.all()
     lookup_field = 'username'
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class UserSignupView(CreateAPIView):
@@ -35,7 +38,7 @@ class LoginView(GenericAPIView):
             'user': UserSerializer(user).data,
             'token': token
         }
-        return Response(data,status=201)
+        return Response(data, status=201)
 
 
 class LogoutView(GenericAPIView):
@@ -48,13 +51,26 @@ class LogoutView(GenericAPIView):
             token.delete()
             return Response(status=204)
         else:
-            return Response({'message':'user not found'}, status=400)
+            return Response({'message': 'user not found'}, status=400)
 
 
 class ProfileStoriesView(ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ProfileStoriesSerializer
+
     def get_queryset(self):
         print(self.request.user.id)
         qs = User.objects.exclude(id=self.request.user.id)[:7]
         return qs
+
+
+class FollowUserView(CreateAPIView, DestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FollowUserSerializer
+    queryset = Follow.objects.all()
+
+    def delete(self, request, *args, **kwargs):
+        obj = Follow.objects.get(
+            follower=request.auth.user, following_id=request.data['following'])
+        obj.delete()
+        return Response({}, 200)

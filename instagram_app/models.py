@@ -3,7 +3,6 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.fields.related import ForeignKey
-from django.dispatch import receiver
 
 
 class UserManager(BaseUserManager):
@@ -35,6 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     image = models.ImageField(upload_to='uploads', null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    description = models.TextField(blank=True, null=True)
 
     objects = UserManager()
 
@@ -69,7 +69,8 @@ class Comment(models.Model):
 class Message(models.Model):
     text = models.CharField(max_length=1000)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    send_to = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="send_to")
+    send_to = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=True, null=True, related_name="send_to")
     created_at = models.DateTimeField(auto_now=True)
 
 
@@ -89,6 +90,16 @@ class Follow(models.Model):
     following = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='following')
     created_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['follower', 'following'], name='unique follow')
+        ]
+
+    def __str__(self):
+        return f'{self.follower} following {self.following}'
+
 
 class PublicChatRoom(models.Model):
     title = models.CharField(max_length=255, unique=True, blank=False)
@@ -116,9 +127,11 @@ class PublicChatRoom(models.Model):
     def group_name(self):
         return f'PublicChatRoom-{self.id}'
 
+
 class PublicChatRoomMessageManager(models.Manager):
     def by_room(self, room):
         return self.model.objects.filter(room=room).order_by('-timestamp')
+
 
 class PublicChatRoomMessage(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
