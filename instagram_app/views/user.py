@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, GenericAPIView, ListCreateAPIView, CreateAPIView, DestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
+from django.db.models import Count, Q
 
 from instagram_app.models import Follow, User
 from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer
@@ -15,11 +16,10 @@ class UserView(ListCreateAPIView):
 
 class UserDetailView(RetrieveUpdateAPIView):
     serializer_class = UserDetailSerializer
-    queryset = serializer_class.Meta.model.objects.all()
+    queryset = serializer_class.Meta.model.objects.annotate(
+        posts_count=Count('post'),
+    )
     lookup_field = 'username'
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
 
 class UserSignupView(CreateAPIView):

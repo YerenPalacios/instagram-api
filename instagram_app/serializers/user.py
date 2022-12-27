@@ -96,6 +96,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
     following = serializers.SerializerMethodField()
+    posts_count = serializers.IntegerField(required=False)
     
     def get_followers_count(self, obj):
         return obj.following.count()
@@ -119,7 +120,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'following',
             'description',
             'followers_count',
-            'following_count'
+            'following_count',
+            'posts_count'
         ]
 
 
