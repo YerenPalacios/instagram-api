@@ -25,6 +25,18 @@ class UserDetailView(RetrieveUpdateAPIView):
 class UserSignupView(CreateAPIView):
     serializer_class = UserSignUpSerializer
 
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid()
+        user = serializer.create(serializer.data)
+        token = Token.objects.create(user=user)
+        data = {
+            'user': UserSerializer(user).data,
+            'token': token.key
+        }
+        return Response(data, status=201)
+
+
 
 class LoginView(GenericAPIView):
     serializer_class = LoginSerializer
