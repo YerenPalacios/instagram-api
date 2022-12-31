@@ -9,6 +9,12 @@ from instagram_app.serializers.message import ChatRoomMessageSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
+    following = serializers.SerializerMethodField()
+
+    def get_following(self, obj):
+        return True if self.context.get('request') and obj.following.filter(
+            follower=self.context['request'].user
+        ) else False
 
     class Meta:
         model = User()
