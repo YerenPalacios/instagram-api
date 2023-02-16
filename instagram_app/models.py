@@ -76,10 +76,22 @@ class Message(models.Model):
 
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, related_name='likes',
-                             on_delete=models.CASCADE, blank=True, null=True)
+    post = models.ForeignKey(
+        Post, related_name='likes',
+        on_delete=models.CASCADE, blank=True, null=True
+    )
     comment = models.ForeignKey(
         Comment, on_delete=models.CASCADE, blank=True, null=True)
+    message = models.ForeignKey(
+        Message, on_delete=models.CASCADE, blank=True, null=True)
+
+
+class Save(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, related_name='saves',
+        on_delete=models.CASCADE, blank=True, null=True
+    )
     message = models.ForeignKey(
         Message, on_delete=models.CASCADE, blank=True, null=True)
 

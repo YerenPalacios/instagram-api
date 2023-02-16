@@ -7,3 +7,5 @@ from .post import *
 from .comment import *
 
 from .like import *
+
+from .save import *

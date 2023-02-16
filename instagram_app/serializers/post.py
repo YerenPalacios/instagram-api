@@ -15,6 +15,7 @@ class PostSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     count_comments = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
+    is_saved = serializers.SerializerMethodField()
 
     def get_comments(self, obj):
         data = obj.comments.all()
@@ -22,6 +23,11 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_is_liked(self, obj):
         if len(obj.likes.all()) == 1:
+            return True
+        return False
+    
+    def get_is_saved(self, obj):
+        if obj.saves.count() == 1:
             return True
         return False
 
