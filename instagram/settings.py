@@ -42,6 +42,7 @@ WHITENOISE_USE_FINDERS = True
 # Application definition
 
 INSTALLED_APPS = [
+    'django_filters',
     "whitenoise.runserver_nostatic",
     'django.contrib.admin',
     'django.contrib.auth',

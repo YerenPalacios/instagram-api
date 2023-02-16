@@ -6,11 +6,13 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import SuspiciousOperation
 
 from django.db.models import Prefetch
+from django_filters import rest_framework as filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from instagram_app.filters.post import ProductFilter
 
-from instagram_app.models import Images, Comment, Like
+from instagram_app.models import Images, Comment, Like, Post
 from instagram_app.serializers import PostSerializer
 
 
@@ -82,6 +84,14 @@ class PostsView(ListCreateAPIView):
 
         return Response(post, status=201)
 
+
+class GeneralPostsView(ListAPIView):
+    queryset = Post.objects.all()
+    # permission_classes = (IsAuthenticated,)
+    serializer_class = PostSerializer
+    filter_backends = filters.DjangoFilterBackend,
+    filterset_class = ProductFilter
+    
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
