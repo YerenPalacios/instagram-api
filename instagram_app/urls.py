@@ -6,6 +6,7 @@ from instagram_app.views.user import (
 from instagram_app.views.post import PostsView, PostDetailView
 from instagram_app.views.comment import CommentView
 from instagram_app.views.like import LikeView
+from instagram_app.views.save import SaveView
 
 
 urlpatterns = [
@@ -21,6 +22,7 @@ urlpatterns = [
     path('post/<int:pk>', PostDetailView.as_view()),
 
     path('like/', LikeView.as_view()),
+    path('save/', SaveView.as_view()),
 
     path('comment/', CommentView.as_view()),
 
