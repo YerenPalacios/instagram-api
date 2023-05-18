@@ -1,12 +1,20 @@
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView, GenericAPIView, ListCreateAPIView, CreateAPIView, DestroyAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    GenericAPIView,
+    ListCreateAPIView,
+    CreateAPIView,
+    DestroyAPIView,
+    RetrieveUpdateAPIView
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from django.db.models import Count, Q
+from django.db.models import Count
 
 from instagram_app.models import Follow, User
 from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer
-from instagram_app.serializers.user import FollowUserSerializer, UserDetailSerializer, UserSignUpSerializer, UserUpdateSerializer
+from instagram_app.serializers.user import FollowUserSerializer, UserDetailSerializer, UserSignUpSerializer
+from instagram_app.services.user_service import UserService
 
 
 class UserView(ListCreateAPIView):
@@ -25,7 +33,7 @@ class UserDetailView(RetrieveUpdateAPIView):
 class UserSignupView(CreateAPIView):
     serializer_class = UserSignUpSerializer
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid()
         user = serializer.create(serializer.data)
@@ -37,19 +45,19 @@ class UserSignupView(CreateAPIView):
         return Response(data, status=201)
 
 
-
 class LoginView(GenericAPIView):
+    name = "login"
     serializer_class = LoginSerializer
     queryset = User.objects.filter(is_active=True)
+
+    def __init__(self):
+        super().__init__()
+        self.service = UserService()
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user, token = serializer.save()
-        data = {
-            'user': UserSerializer(user).data,
-            'token': token
-        }
+        data = self.service.login(serializer.data)
         return Response(data, status=201)
 
 
