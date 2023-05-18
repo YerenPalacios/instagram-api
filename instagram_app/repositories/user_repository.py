@@ -17,3 +17,7 @@ class UserRepository:
         user = self.authenticate(data)
         token, created = Token.objects.get_or_create(user=user)
         return user, token
+
+    @staticmethod
+    def get_following(user_id: int):
+        return User.objects.filter(following__follower_id=user_id)
