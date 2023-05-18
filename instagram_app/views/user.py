@@ -75,13 +75,16 @@ class LogoutView(GenericAPIView):
 
 
 class ProfileStoriesView(ListAPIView):
+    name = "profile-stories"
     permission_classes = (IsAuthenticated,)
     serializer_class = ProfileStoriesSerializer
 
+    def __init__(self):
+        super().__init__()
+        self.service = UserService()
+
     def get_queryset(self):
-        print(self.request.user.id)
-        qs = User.objects.exclude(id=self.request.user.id)[:7]
-        return qs
+        return self.service.get_following_users(self.request.user.id)
 
 
 class FollowUserView(CreateAPIView, DestroyAPIView):

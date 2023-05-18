@@ -15,7 +15,7 @@ urlpatterns = [
     path('sign-up/', UserSignupView.as_view()),
     path('login/', LoginView.as_view(), name=LoginView.name),
     path('logout/', LogoutView.as_view()),
-    path('profile-stories/', ProfileStoriesView.as_view()),
+    path('profile-stories/', ProfileStoriesView.as_view(), name=ProfileStoriesView.name),
     path('follow/', FollowUserView.as_view()),
 
     path('post/', PostsView.as_view()),
