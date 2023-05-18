@@ -40,6 +40,7 @@ WHITENOISE_USE_FINDERS = True
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django_filters',
     "whitenoise.runserver_nostatic",
     'django.contrib.admin',
