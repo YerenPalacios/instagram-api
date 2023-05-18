@@ -9,13 +9,12 @@ from django.db.models import Prefetch
 from django_filters import rest_framework as filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, ListCreateAPIView
 from instagram_app.filters.post import ProductFilter
 
 from instagram_app.models import Images, Comment, Like, Post
 from instagram_app.serializers import PostSerializer
-
-
+from instagram_app.services.post_service import PostService
 
 
 # WARNING: quick and dirty, should be used for reference only.
@@ -47,21 +46,14 @@ def to_file(file_from_POST):
 
   
 class PostsView(ListCreateAPIView):
-    permission_classes = (IsAuthenticated,)
+    name = "posts"
     serializer_class = PostSerializer
+    service = PostService()
 
     def get_queryset(self):
-        queryset = self.serializer_class.Meta.model.objects.prefetch_related(
-            Prefetch('likes', queryset=Like.objects.filter(user=self.request.user)), 
-            Prefetch(
-                'comments',
-                queryset=Comment.objects.filter(
-                    user=self.request.user
-                ).select_related('user')
-            ),
-            'images'
-        ).order_by('-created_at')
-        return queryset
+        user = self.request.user
+        priority = self.request.GET.get('priority')
+        return self.service.get_posts(user.id if user.is_authenticated else None, priority)
 
     def get_serializer_context(self):
         context = super(PostsView, self).get_serializer_context()

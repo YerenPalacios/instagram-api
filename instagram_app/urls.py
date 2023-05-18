@@ -18,7 +18,7 @@ urlpatterns = [
     path('profile-stories/', ProfileStoriesView.as_view(), name=ProfileStoriesView.name),
     path('follow/', FollowUserView.as_view()),
 
-    path('post/', PostsView.as_view()),
+    path('post/', PostsView.as_view(), name=PostsView.name),
     path('post/<int:pk>', PostDetailView.as_view()),
     path('general-post/', GeneralPostsView.as_view()),
 
