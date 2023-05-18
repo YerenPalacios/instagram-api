@@ -47,18 +47,6 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=64)
 
-    def validate(self, data):
-        user = authenticate(email=data['email'],password=data['password'])
-        if not user:
-            raise serializers.ValidationError('Invalid username or password')
-
-        self.context['user'] = user
-        return data
-    
-    def create(self, data):
-        token, created = Token.objects.get_or_create(user=self.context['user'])
-        return self.context['user'], token.key
-
 
 class UserSignUpSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=30)
