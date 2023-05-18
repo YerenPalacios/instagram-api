@@ -5,8 +5,10 @@ import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer, WebsocketConsumer
 
+from chat.services.chat_service import ChatService
 from instagram_app.serializers.message import MessageSerializer, ChatRoomMessageSerializer
 from chat.models import *
+from instagram_app.services.user_service import UserService
 
 logging.basicConfig(
     format="%(asctime)s %(message)s",
@@ -72,45 +74,51 @@ def save_message(msg, by_user):
     message = MessageSerializer(a).data
     return message
 
-from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import AnonymousUser
 
 class ChatConsumer2(JsonWebsocketConsumer):
 
     available_actions = ['get_messages', 'add_message']
     chat_room = None
+    service = ChatService()
+    user_service = UserService()
 
-    def set_user(self):
-        auth = self.scope['cookies'].get('Authorization')
-        if auth:
-            try:
-                token_name, token_key = auth.split()
-                if token_name == 'Token':
-                    token = Token.objects.get(key=token_key)
-                    self.scope['user'] = token.user
-            except Token.DoesNotExist:
-                raise
-        else:
-            raise
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.chat_id = None
 
-    def get_chat_id(self):
-        qs = self.scope.get('query_string')
-        room_id = int(qs.replace(b'room_id=',b''))
-        return str(room_id)
+    def get_query_data(self):
+        params = self.scope['query_string'].decode('utf-8').split('&')
+        if len(params) != 2:
+            raise ValueError('no sirve')
+
+        token_key, token_value = params[1].replace("'", "").split('=')
+        if token_key != 'token':
+            raise ValueError('tampoco sirve')
+
+        room_key, room_id = params[0].replace("'", "").split('=')
+        if room_key != 'room_id':
+            raise ValueError('tampoco sirve el room id')
+
+        return {"room_id": room_id, "token": token_value}
+
+    def set_room(self):
+        try:
+            data = self.get_query_data()
+            self.scope['user'] = self.user_service.get_current_user(data['token'])
+            self.chat_id = data['room_id']
+        except ValueError as e:
+            self.send_json({'detail': str(e)})
+            self.close()
 
     def connect(self):
-        self.set_user()
-
-        self.chat_id = self.get_chat_id()
-        
+        self.accept()
+        self.set_room()
 
         # Join chat
         async_to_sync(self.channel_layer.group_add)(
             self.chat_id,
             self.channel_name
         )
-
-        self.accept()
         self.get_messages()
 
     def disconnect(self, close_code):
@@ -119,48 +127,31 @@ class ChatConsumer2(JsonWebsocketConsumer):
             self.channel_name
         )
 
-    def receive_json(self, data):
+    def receive_json(self, data, **kwargs):
         action = data.get('action')
 
         if not action:
-            return self.send_json({'error':'No action provided'})
+            return self.send_json({'detail': 'No action provided'})
 
         if data['action'] in self.available_actions:
-            # saved_message = save_message(data['text'], self.scope['user'])
-            if data['action'] == 'add_message':
-                message = ChatRoomMessage.objects.create(
-                    user=self.scope['user'], 
-                    room=self.scope['room'],
-                    content=data['text']
-                )
-                async_to_sync(self.channel_layer.group_send)(
-                    self.chat_id,
-                    {
-                        "type": data['action'],
-                        "text": ChatRoomMessageSerializer(message).data,
-                    }
-                )
-            else:
-                async_to_sync(self.channel_layer.group_send)(
-                    self.chat_id,
-                    {
-                        "type": data['action'],
-                        "text": data['text'],
-                    }
-                )
+            async_to_sync(self.channel_layer.group_send)(
+                self.chat_id, {"type": data['action'], "text": data['text']}
+            )
 
-        # Send message to room group
-        
-
-    # Receive message from room group
     def add_message(self, data):
-   
-        self.send_json(data)
+        """ Create a chat message """
+        message = self.service.create_message(
+            self.scope['user'].id,
+            self.get_query_data()['room_id'],
+            data['text']
+        )
+        self.send_json(message)
 
     def get_messages(self):
-        room = ChatRoom.objects.get(id=self.get_chat_id())
+        """ return list of messages by room """
+        #TODO: review this calls
+        room_id = self.get_query_data()['room_id']
+        room = ChatRoom.objects.get(id=room_id)
         self.scope['room'] = room
-        print(room)
-        messages = ChatRoomMessageSerializer(room.chatroommessage_set.all(), many=True).data
-        self.send_json({'type':'get_messages','data':messages})
-        
+        messages = self.service.get_messages_by_room(int(room_id))
+        self.send_json({'type': 'get_messages', 'data': messages})

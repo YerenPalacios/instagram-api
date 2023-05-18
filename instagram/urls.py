@@ -19,10 +19,13 @@ from django.urls.conf import include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from instagram.asgi import application
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('chat/', include('chat.urls')),
+    path('admin/', admin.site.urls),
     path('', include('instagram_app.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
+    path('', application),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
