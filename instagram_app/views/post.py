@@ -10,7 +10,7 @@ from django_filters import rest_framework as filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, ListCreateAPIView
-from instagram_app.filters.post import ProductFilter
+from instagram_app.filters.post import PostFilter
 
 from instagram_app.models import Images, Comment, Like, Post
 from instagram_app.serializers import PostSerializer
@@ -49,6 +49,8 @@ class PostsView(ListCreateAPIView):
     name = "posts"
     serializer_class = PostSerializer
     service = PostService()
+    filter_backends = filters.DjangoFilterBackend,
+    filterset_class = PostFilter
 
     def get_queryset(self):
         user = self.request.user
@@ -57,10 +59,10 @@ class PostsView(ListCreateAPIView):
 
     def get_serializer_context(self):
         context = super(PostsView, self).get_serializer_context()
-        context.update({'user' : self.request.user})
+        context.update({'user': self.request.user})
         return context
 
-    def post(self, request, format=None):
+    def post(self, request, *args):
         model = self.serializer_class.Meta.model
         post = model.objects.create(
             user=self.request.user,
@@ -76,14 +78,6 @@ class PostsView(ListCreateAPIView):
 
         return Response(post, status=201)
 
-
-class GeneralPostsView(ListAPIView):
-    queryset = Post.objects.all()
-    # permission_classes = (IsAuthenticated,)
-    serializer_class = PostSerializer
-    filter_backends = filters.DjangoFilterBackend,
-    filterset_class = ProductFilter
-    
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
