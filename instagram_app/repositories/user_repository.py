@@ -21,3 +21,6 @@ class UserRepository:
     @staticmethod
     def get_following(user_id: int):
         return User.objects.filter(following__follower_id=user_id)
+
+    def get_following_user_ids(self, user_id: int) -> list:
+        return self.get_following(user_id).values_list('id')
