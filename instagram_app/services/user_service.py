@@ -12,6 +12,11 @@ class UserService:
         user, token = self._repository.get_token(data)
         return {"user": UserSerializer(user).data, "token": token.key}
 
+    def get_users(self, data: dict = None):
+        if data.get('search'):
+            return self._repository.get_users_by_name(data.get('search'))
+        return self._repository.get_users()
+
     def get_following_users(self, user_id):
         return self._repository.get_following(user_id)
 

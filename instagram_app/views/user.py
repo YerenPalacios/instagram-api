@@ -19,7 +19,10 @@ from instagram_app.services.user_service import UserService
 
 class UserView(ListCreateAPIView):
     serializer_class = UserSerializer
-    queryset = serializer_class.Meta.model.objects.all()
+    service = UserService()
+
+    def get_queryset(self):
+        return self.service.get_users(self.request.GET)
 
 
 class UserDetailView(RetrieveUpdateAPIView):
