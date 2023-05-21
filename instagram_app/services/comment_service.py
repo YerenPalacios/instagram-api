@@ -9,4 +9,4 @@ class CommentService:
 
     def get_post_comments(self, post_id: int):
         comments = self._repository.get_comments_by_post(post_id)
-        return CommentViewSerializer(comments, many=True)
+        return CommentViewSerializer(comments, many=True).data
