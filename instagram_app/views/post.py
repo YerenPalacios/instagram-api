@@ -13,7 +13,7 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, L
 from instagram_app.filters.post import PostFilter
 
 from instagram_app.models import Images, Comment, Like, Post
-from instagram_app.serializers import PostSerializer
+from instagram_app.serializers import PostSerializer, UserSerializer
 from instagram_app.services.post_service import PostService
 
 
@@ -61,6 +61,14 @@ class PostsView(ListCreateAPIView):
         context = super(PostsView, self).get_serializer_context()
         context.update({'user': self.request.user})
         return context
+
+    def list(self, request, *args):
+        if request.GET.get('scraper'):
+            data = self.service.get_scraper_posts()
+            for item in data:
+                item['user'] = UserSerializer(request.auth.user).data
+            return Response(data)
+        return super(PostsView, self).list(request, *args)
 
     def post(self, request, *args):
         model = self.serializer_class.Meta.model
