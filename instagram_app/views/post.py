@@ -46,6 +46,10 @@ def to_file(file_from_POST):
     return image
 
 
+DEFAULT_LIMIT = 5
+DEFAULT_OFFSET = 0
+
+
 class PostsView(ListCreateAPIView):
     name = "posts"
     serializer_class = PostSerializer
@@ -55,8 +59,12 @@ class PostsView(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        priority = self.request.GET.get('priority')
-        return self.service.get_posts(user.id if user.is_authenticated else None, priority)
+        params = self.request.GET
+        priority = params.get('priority')
+        limit = int(params.get('limit', DEFAULT_LIMIT)) or DEFAULT_LIMIT
+        offset = int(params.get('offset', DEFAULT_OFFSET)) or DEFAULT_OFFSET
+        user_id = user.id if user.is_authenticated else None
+        return self.service.get_posts(limit, offset, user_id, priority)
 
     def get_serializer_context(self):
         context = super(PostsView, self).get_serializer_context()

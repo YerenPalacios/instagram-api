@@ -15,7 +15,7 @@ class PostRepository:
             ).order_by('-created_at').values('text')[:1])
         )
 
-    def get_posts_for_user(self, user_id: int, priority: bool) -> QuerySet[Post]:
+    def get_posts_for_user(self, user_id: int, priority: bool, limit, offset) -> QuerySet[Post]:
         following_ids = UserRepository().get_following_user_ids(user_id)
         order_fields = ['-created_at']
         posts = self._get_posts().annotate(
@@ -27,7 +27,7 @@ class PostRepository:
             order_fields = ['-priority', '-created_at']
             posts = posts.annotate(priority=Case(When(Q(user_id__in=following_ids), then=1), default=0))
 
-        return posts.order_by(*order_fields)
+        return posts.order_by(*order_fields)[offset: offset + limit]
 
-    def get_general_posts(self) -> QuerySet[Post]:
-        return self._get_posts().order_by('-created_at')
+    def get_general_posts(self, limit, offset) -> QuerySet[Post]:
+        return self._get_posts().order_by('-created_at')[offset: offset + limit]
