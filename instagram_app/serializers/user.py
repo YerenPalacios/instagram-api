@@ -6,6 +6,7 @@ from rest_framework import serializers
 from instagram_app.models import Follow
 
 from instagram_app.serializers.message import ChatRoomMessageSerializer
+from instagram_app.utils import generate_random_color
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -71,12 +72,13 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         required=False
     )
     
-    def create(self, validated_data:dict):
+    def create(self, validated_data: dict):
         if not validated_data.get('image'):
             validated_data['image'] = None
         password = validated_data.pop('password') 
         user = self.Meta.model.objects.create(**validated_data)
         user.set_password(password)
+        user.color = generate_random_color()
         user.save()
         return user
 
@@ -88,7 +90,7 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 class ProfileStoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = User()
-        fields = ['id','username','image']
+        fields = ['id', 'username', 'image', 'color']
 
 
 class UserDetailSerializer(serializers.ModelSerializer):

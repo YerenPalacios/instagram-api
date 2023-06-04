@@ -1,7 +1,7 @@
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 
-from instagram_app.serializers import CommentSerializer, CommentViewSerializer
+from instagram_app.serializers import CommentViewSerializer
 from instagram_app.services.comment_service import CommentService
 
 
@@ -16,17 +16,9 @@ class CommentView(ListCreateAPIView):
         return Response(data)
 
     def create(self, request, *args):
-        print(request.data)
         data = {
             'post': request.data.get('post'),
             'text': request.data.get('text'),
             'user': request.user.id
         }
-        serializer = self.serializer_class(data=data, context=data)
-        serializer.is_valid(raise_exception=True)
-        comment = serializer.save()
-        return Response({
-            'comments': CommentSerializer(
-                comment.post.comments.all(), many=True
-            ).data
-        })
+        return Response(self.service.create_comment(data))
