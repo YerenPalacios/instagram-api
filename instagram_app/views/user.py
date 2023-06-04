@@ -23,7 +23,11 @@ class UserView(ListCreateAPIView):
 
     def get_queryset(self):
         limit = self.request.GET.get('page_size')
-        return self.service.get_users(self.request.GET, int(limit) if limit else None)
+        return self.service.get_users(
+            self.request.GET,
+            int(limit) if limit else None,
+            self.request.auth.user.id if self.request.auth else None
+        )
 
 
 class UserDetailView(RetrieveUpdateAPIView):

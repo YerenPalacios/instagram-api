@@ -10,7 +10,7 @@ from instagram_app.utils import generate_random_color
 
 
 class UserSerializer(serializers.ModelSerializer):
-    following = serializers.SerializerMethodField()
+    is_following = serializers.BooleanField(default=None)
 
     def get_following(self, obj):
         #TODO: change this weird thing
@@ -24,7 +24,14 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User()
-        exclude = ('user_permissions', 'groups','is_staff', 'password',)
+        exclude = ('user_permissions', 'groups', 'is_staff', 'password',)
+        read_only_fields = ('name',)
+
+
+class UserPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User()
+        fields = ['image', 'name', 'username']
         read_only_fields = ('name',)
 
 

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from instagram_app.models import Post
-from instagram_app.serializers import ImagesSerializer, UserSerializer
+from instagram_app.serializers import ImagesSerializer, UserSerializer, UserPostSerializer
 from instagram_app.serializers.comment import CommentSerializer
 
 
@@ -10,7 +10,7 @@ from instagram_app.serializers.comment import CommentSerializer
 
 class PostSerializer(serializers.ModelSerializer):
     images = ImagesSerializer(many=True)
-    user = UserSerializer()
+    user = UserPostSerializer()
     likes_count = serializers.IntegerField()
     comments_count = serializers.IntegerField()
     last_owner_comment = serializers.CharField()
