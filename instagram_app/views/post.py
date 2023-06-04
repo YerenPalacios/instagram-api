@@ -74,7 +74,11 @@ class PostsView(ListCreateAPIView):
             for image in images:
                 Images.objects.create(image=to_file(image), post=post)
 
-        post = self.serializer_class(post).data
+        post.likes_count = 0
+        post.last_owner_comment = 0
+        post.comments_count = 0
+
+        post = self.get_serializer(post).data
 
         return Response(post, status=201)
 
