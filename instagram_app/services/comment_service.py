@@ -1,5 +1,5 @@
 from instagram_app.repositories.comment_repository import CommentRepository
-from instagram_app.serializers import CommentViewSerializer
+from instagram_app.serializers import CommentSerializer, CommentViewSerializer
 
 
 class CommentService:
@@ -9,4 +9,10 @@ class CommentService:
 
     def get_post_comments(self, post_id: int):
         comments = self._repository.get_comments_by_post(post_id)
-        return CommentViewSerializer(comments, many=True).data
+        return CommentSerializer(comments, many=True).data
+
+    def create_comment(self, data: dict):
+        serializer = CommentViewSerializer(data=data, context=data)
+        serializer.is_valid(raise_exception=True)
+        comment = serializer.save()
+        return CommentSerializer(comment).data
