@@ -28,7 +28,7 @@ def to_file(file_from_POST):
         if not idx or not file_from_POST.startswith('data:image/'):
             raise Exception()
 
-        base64file = file_from_POST[idx+1:]
+        base64file = file_from_POST[idx + 1:]
         attributes = file_from_POST[:idx]
         content_type = attributes[len('data:'):attributes.find(';')]
     except Exception as e:
@@ -36,15 +36,16 @@ def to_file(file_from_POST):
 
     f = io.BytesIO(base64.b64decode(base64file))
     ext = content_type.split('/')[1]
-    image = InMemoryUploadedFile(f,
-       field_name='picture',
-       name='picture.'+ext,  # use UUIDv4 or something
-       content_type=content_type,
-       size=sys.getsizeof(f),
-       charset=None)
+    image = InMemoryUploadedFile(
+        f,
+        field_name='picture',
+        name='picture.' + ext,  # use UUIDv4 or something
+        content_type=content_type,
+        size=sys.getsizeof(f),
+        charset=None)
     return image
 
-  
+
 class PostsView(ListCreateAPIView):
     name = "posts"
     serializer_class = PostSerializer

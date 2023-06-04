@@ -12,10 +12,10 @@ class UserService:
         user, token = self._repository.get_token(data)
         return {"user": UserSerializer(user).data, "token": token.key}
 
-    def get_users(self, data: dict = None, limit: int = None):
+    def get_users(self, data: dict = None, limit: int = None, auth_user_id: int = None):
         if data.get('search'):
-            return self._repository.get_users_by_name(data.get('search'))
-        users = self._repository.get_users()
+            return self._repository.get_users_by_name(data.get('search'), auth_user_id)
+        users = self._repository.get_users(auth_user_id)
         if limit:
             return users[:limit]
         return users
