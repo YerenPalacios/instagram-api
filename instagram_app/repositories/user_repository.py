@@ -36,3 +36,8 @@ class UserRepository:
 
     def get_users_by_name(self, name) -> QuerySet[User]:
         return self.get_users().filter(Q(name__icontains=name) | Q(username__icontains=name))[:10]
+
+    def get_user_with_filter(self, value):
+        users = User.objects.filter(Q(username=value) | Q(email=value))
+        if users:
+            return users[0]

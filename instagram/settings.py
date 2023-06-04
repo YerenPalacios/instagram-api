@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'instagram_app',
     'chat',
-    'channels'
+    'channels',
+    'celery',
 ]
 
 MIDDLEWARE = [
@@ -177,5 +178,39 @@ REST_FRAMEWORK = {
 
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
+
+# email
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SERVER_EMAIL = '129.0.0.1:8000'
+# DJANGO_EMAIL_BACKEND=anymail.backends.mandrill.EmailBackend
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+
+EMAIL_HOST_USER = 'yerenagmt2@gmail.com'
+EMAIL_HOST_PASSWORD = 'shatavubiblstokg'
+
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_ALWAYS_EAGER = False
+
+
+#logger
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',  # Establece el nivel de registro deseado (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    },
+}
 
 django_heroku.settings(locals())

@@ -25,3 +25,14 @@ class UserService:
         if not user:
             raise ValidationError()
         return user
+
+    def get_user_by_param(self, data: dict):
+        if not data: return
+        value = ''
+        if data.get('email'):
+            value = data.get('email')
+        return self._repository.get_user_with_filter(value)
+
+    def send_reset_password_email(self, user_id: int):
+        ...
+

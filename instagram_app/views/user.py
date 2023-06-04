@@ -64,6 +64,15 @@ class LoginView(GenericAPIView):
         return Response(data, status=201)
 
 
+class ResetPasswordEmailView(GenericAPIView):
+    name = "reset-password"
+    service = UserService()
+
+    def post(self, request):
+        user = self.service.get_user_by_param(request.data)
+        return self.service.send_reset_password_email(user.id)
+
+
 class LogoutView(GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = (IsAuthenticated,)
