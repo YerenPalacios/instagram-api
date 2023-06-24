@@ -32,3 +32,6 @@ class PostRepository:
 
     def get_general_posts(self, limit, offset) -> QuerySet[Post]:
         return self._get_posts().order_by('-created_at')[offset: offset + limit]
+
+    def get_post(self, post_id: int) -> Post:
+        return self._get_posts().get(id=post_id)

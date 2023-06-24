@@ -100,9 +100,13 @@ class PostsView(ListCreateAPIView):
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PostSerializer
+    service = PostService()
     queryset = serializer_class.Meta.model.objects.select_related(
         'user'
     ).prefetch_related('images', 'comments', 'likes')
+
+    def get_object(self):
+        return self.service.get_post(self.kwargs['pk'])
 
 
 class SharePostSerializer(serializers.Serializer):

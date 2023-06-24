@@ -16,3 +16,6 @@ class PostService:
         self.chat_repository.create_message(room_id=chat_room_id, user_id=from_user, content=str(post_id), is_post=True)
         if text != '':
             self.chat_repository.create_message(room_id=chat_room_id, user_id=from_user, content=text)
+
+    def get_post(self, post_id: int):
+        return self._repository.get_post(post_id)
