@@ -31,7 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = User()
-        fields = ['image', 'name', 'username']
+        fields = ['image', 'name', 'username', 'color']
         read_only_fields = ('name',)
 
 
@@ -129,7 +129,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'description',
             'followers_count',
             'following_count',
-            'posts_count'
+            'posts_count',
+            'color'
         ]
 
 
