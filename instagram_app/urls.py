@@ -4,7 +4,7 @@ from instagram_app.views.message import MessageView, ChatListView
 from instagram_app.views.user import (
     FollowUserView, UserDetailView, UserView, ProfileStoriesView, LoginView, LogoutView, UserSignupView
 )
-from instagram_app.views.post import PostsView, PostDetailView
+from instagram_app.views.post import PostsView, PostDetailView, SharePostView
 from instagram_app.views.comment import CommentView
 from instagram_app.views.like import LikeView
 from instagram_app.views.save import SaveView
@@ -29,4 +29,5 @@ urlpatterns = [
 
     path('message/', MessageView.as_view()),
     path('chatlist/', ChatListView.as_view()),
+    path(SharePostView.path, SharePostView.as_view())
 ]
