@@ -4,15 +4,13 @@ import sys
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import SuspiciousOperation
+from rest_framework import serializers
 
-from django.db.models import Prefetch
-from django_filters import rest_framework as filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, ListCreateAPIView
-from instagram_app.filters.post import PostFilter
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, GenericAPIView
 
-from instagram_app.models import Images, Comment, Like, Post
+from instagram_app.models import Images
 from instagram_app.serializers import PostSerializer
 from instagram_app.services.post_service import PostService
 
@@ -105,3 +103,21 @@ class PostDetailView(RetrieveUpdateDestroyAPIView):
     queryset = serializer_class.Meta.model.objects.select_related(
         'user'
     ).prefetch_related('images', 'comments', 'likes')
+
+
+class SharePostSerializer(serializers.Serializer):
+    chat_room_id = serializers.IntegerField()
+    post_id = serializers.IntegerField()
+    text = serializers.CharField(allow_blank=True)
+
+
+class SharePostView(GenericAPIView):
+    name = 'share_post_view'
+    path = 'share-post/'
+    service = PostService()
+
+    def post(self, request):
+        serializer = SharePostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.service.share_post(**serializer.data, from_user=request.auth.user.id)
+        return Response('Ok')

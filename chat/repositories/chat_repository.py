@@ -1,6 +1,8 @@
-from django.db.models import QuerySet
+from typing import List
 
-from chat.models import ChatRoomMessage
+from django.db.models import QuerySet, Count
+
+from chat.models import ChatRoomMessage, ChatRoom
 
 
 class ChatRepository:
@@ -9,5 +11,8 @@ class ChatRepository:
         return ChatRoomMessage.objects.filter(room_id=room_id)
 
     @staticmethod
-    def create_message(user_id: int, room_id: int, content: str) -> ChatRoomMessage:
-        return ChatRoomMessage.objects.create(user_id=user_id, room_id=room_id, content=content)
+    def create_message(user_id: int, room_id: int, content: str, **kwargs) -> ChatRoomMessage:
+        return ChatRoomMessage.objects.create(user_id=user_id, room_id=room_id, content=content, **kwargs)
+
+    def get_chat_room(self, chat_room_id: int) -> ChatRoom:
+        return ChatRoom.objects.get(id=chat_room_id)
