@@ -7,7 +7,7 @@ from instagram_app.repositories.user_repository import UserRepository
 class PostRepository:
     @staticmethod
     def _get_posts() -> QuerySet[Post]:
-        return Post.objects.prefetch_related('images', 'user').annotate(
+        return Post.objects.prefetch_related('files', 'user').annotate(
             comments_count=Count('comments', distinct=True),
             likes_count=Count('likes', distinct=True),
             last_owner_comment=Subquery(Comment.objects.filter(

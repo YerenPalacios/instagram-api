@@ -52,9 +52,9 @@ class Post(models.Model):
     text = models.TextField(max_length=500)
 
 
-class Images(models.Model):
-    image = models.ImageField(upload_to='uploads/posts', blank=True, null=True)
-    post = ForeignKey(Post, related_name='images', on_delete=models.CASCADE)
+class Files(models.Model):
+    file = models.FileField(upload_to='uploads/posts', blank=True, null=True)
+    post = ForeignKey(Post, related_name='files', on_delete=models.CASCADE)
 
 
 class Comment(models.Model):

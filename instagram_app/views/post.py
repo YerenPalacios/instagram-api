@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, GenericAPIView
 
-from instagram_app.models import Images
+from instagram_app.models import Files
 from instagram_app.serializers import PostSerializer
 from instagram_app.services.post_service import PostService
 
@@ -82,11 +82,11 @@ class PostsView(ListCreateAPIView):
             user=self.request.user,
             text=self.request.data.get('text')
         )
-        images = request.data.get('images', [])
+        files = request.data.get('files', [])
 
-        if len(images) > 0:
-            for image in images:
-                Images.objects.create(image=to_file(image), post=post)
+        if len(files) > 0:
+            for file in files:
+                Files.objects.create(file=to_file(file), post=post)
 
         post.likes_count = 0
         post.last_owner_comment = 0

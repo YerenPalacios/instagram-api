@@ -1,14 +1,13 @@
 from django.contrib import admin
 from django.core.paginator import Paginator
 from django.core.cache import cache
-from django.db import models
 from instagram_app.models import PublicChatRoom, PublicChatRoomMessage
 
-from instagram_app.models import Comment, Follow, Like, Message, Post, User, Images
+from instagram_app.models import Comment, Follow, Like, Message, Post, User, Files
 
 # Register your models here.
 
-models = [Post, User, Like, Comment, Follow, Images, Message]
+models = [Post, User, Like, Comment, Follow, Files, Message]
 
 admin.site.register(models)
 

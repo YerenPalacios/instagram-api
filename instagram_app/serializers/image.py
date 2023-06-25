@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from instagram_app.models import Images
+from instagram_app.models import Files
 
-class ImagesSerializer(serializers.ModelSerializer):
+class FilesSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Images
-        fields = ['image']
+        model = Files
+        fields = ['file']
