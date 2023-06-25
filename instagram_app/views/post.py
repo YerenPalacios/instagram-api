@@ -1,47 +1,14 @@
-import base64
-import io
-import sys
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.exceptions import SuspiciousOperation
 from rest_framework import serializers
 
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, GenericAPIView
 
+from instagram_app.helpers import to_file
 from instagram_app.models import Files
 from instagram_app.serializers import PostSerializer
 from instagram_app.services.post_service import PostService
-
-
-# WARNING: quick and dirty, should be used for reference only.
-
-def to_file(file_from_POST):
-    """base64 encoded file to Django InMemoryUploadedFile that can be placed into request.FILES."""
-    # 'data:image/png;base64,<base64 encoded string>'
-    try:
-        idx = file_from_POST[:50].find(',')  # comma should be pretty early on
-
-        if not idx or not file_from_POST.startswith('data:image/'):
-            raise Exception()
-
-        base64file = file_from_POST[idx + 1:]
-        attributes = file_from_POST[:idx]
-        content_type = attributes[len('data:'):attributes.find(';')]
-    except Exception as e:
-        raise SuspiciousOperation("Invalid picture")
-
-    f = io.BytesIO(base64.b64decode(base64file))
-    ext = content_type.split('/')[1]
-    image = InMemoryUploadedFile(
-        f,
-        field_name='picture',
-        name='picture.' + ext,  # use UUIDv4 or something
-        content_type=content_type,
-        size=sys.getsizeof(f),
-        charset=None)
-    return image
 
 
 DEFAULT_LIMIT = 5
@@ -83,10 +50,13 @@ class PostsView(ListCreateAPIView):
             text=self.request.data.get('text')
         )
         files = request.data.get('files', [])
+        files_to_create = []
 
         if len(files) > 0:
             for file in files:
-                Files.objects.create(file=to_file(file), post=post)
+                files_to_create.append(Files(file=to_file(file), post=post))
+
+        Files.objects.bulk_create(files_to_create)
 
         post.likes_count = 0
         post.last_owner_comment = 0
