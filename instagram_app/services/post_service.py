@@ -8,15 +8,19 @@ class PostService:
         self._repository = PostRepository()
         self.chat_repository = ChatRepository()
 
+    @staticmethod
+    def _add_thumbnail(post):
+        for file in post.files.all():
+            if file.file.name.endswith('.mp4'):
+                file.thumbnail = generate_thumbnail(file.file.path)
+
     def get_posts(self, limit=0, offset=0, user_id: int = None, **kwargs):
         if user_id:
             posts = self._repository.get_posts_for_user(user_id, limit, offset, **kwargs)
         else:
             posts = self._repository.get_general_posts(limit, offset)
         for post in posts:
-            for file in post.files.all():
-                if file.file.name.endswith('.mp4'):
-                    file.thumbnail = generate_thumbnail(file.file.path)
+            self._add_thumbnail(post)
         return posts
 
     def share_post(self, post_id: int, text: str, chat_room_id: int, from_user: int):
@@ -25,4 +29,6 @@ class PostService:
             self.chat_repository.create_message(room_id=chat_room_id, user_id=from_user, content=text)
 
     def get_post(self, post_id: int):
-        return self._repository.get_post(post_id)
+        post = self._repository.get_post(post_id)
+        self._add_thumbnail(post)
+        return post
