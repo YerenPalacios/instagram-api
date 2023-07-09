@@ -28,3 +28,7 @@ class UserService:
         if not user:
             raise ValidationError()
         return user
+
+    def get_user_exists(self, value: str):
+        return {"exists": self._repository.get_user_exists(value)}
+

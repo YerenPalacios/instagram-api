@@ -5,7 +5,7 @@ from rest_framework.generics import (
     ListCreateAPIView,
     CreateAPIView,
     DestroyAPIView,
-    RetrieveUpdateAPIView
+    RetrieveUpdateAPIView, RetrieveAPIView
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
@@ -13,7 +13,8 @@ from django.db.models import Count
 
 from instagram_app.models import Follow, User
 from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer
-from instagram_app.serializers.user import FollowUserSerializer, UserDetailSerializer, UserSignUpSerializer
+from instagram_app.serializers.user import FollowUserSerializer, UserDetailSerializer, UserSignUpSerializer, \
+    UserExistsSerializer
 from instagram_app.services.user_service import UserService
 
 
@@ -105,3 +106,13 @@ class FollowUserView(CreateAPIView, DestroyAPIView):
             follower=request.auth.user, following_id=request.data['following'])
         obj.delete()
         return Response({}, 200)
+
+
+class UserExistsView(RetrieveAPIView):
+    service = UserService()
+    serializer_class = UserExistsSerializer
+
+    def get_object(self):
+        user_value = self.request.GET.get('value')
+        return self.service.get_user_exists(user_value)
+

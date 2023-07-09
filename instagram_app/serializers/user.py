@@ -143,6 +143,10 @@ class FollowUserSerializer(serializers.ModelSerializer):
     def create(self, data):
         user = self.context['request'].user
         return Follow.objects.create(
-            follower = user,
-            following = data['following']
+            follower=user,
+            following=data['following']
         )
+
+
+class UserExistsSerializer(serializers.Serializer):
+    exists = serializers.BooleanField()
