@@ -2,6 +2,7 @@ from rest_framework.exceptions import ValidationError
 
 from instagram_app.repositories.user_repository import UserRepository
 from instagram_app.serializers import UserSerializer
+from instagram_app.utils import generate_random_color
 
 
 class UserService:
@@ -32,3 +33,5 @@ class UserService:
     def get_user_exists(self, value: str):
         return {"exists": self._repository.get_user_exists(value)}
 
+    def create_user(self, data: dict):
+        return self._repository.create_user(data)
