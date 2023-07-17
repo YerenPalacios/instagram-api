@@ -4,8 +4,10 @@ from django.contrib.auth import authenticate
 from django.db.models import QuerySet, Q, OuterRef, Exists
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import ValidationError
 
 from instagram_app.models import User, Follow
+from instagram_app.utils import generate_random_color
 
 
 class UserRepository:
@@ -51,3 +53,15 @@ class UserRepository:
 
     def get_user_exists(self, value):
         return User.objects.filter(Q(username=value) | Q(email=value)).exists()
+
+    def create_user(self, data):
+        if self.get_user_exists(data['email']) or self.get_user_exists(data['username']):
+            raise ValidationError({'error': 'User already exists'})
+        if not data.get('image'):
+            data['image'] = None
+        password = data.pop('password')
+        user = User.objects.create(**data)
+        user.set_password(password)
+        user.color = generate_random_color()
+        user.save()
+        return user

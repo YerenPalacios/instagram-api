@@ -41,17 +41,14 @@ class UserDetailView(RetrieveUpdateAPIView):
 
 class UserSignupView(CreateAPIView):
     serializer_class = UserSignUpSerializer
+    service = UserService()
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid()
-        user = serializer.create(serializer.data)
-        token = Token.objects.create(user=user)
-        data = {
-            'user': UserSerializer(user).data,
-            'token': token.key
-        }
-        return Response(data, status=201)
+        user = self.service.create_user(serializer.data)
+        auth = self.service.login({'email': user.email, 'password': serializer.data.get("password")})
+        return Response(auth, status=201)
 
 
 class LoginView(GenericAPIView):
