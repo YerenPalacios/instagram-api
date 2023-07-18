@@ -35,6 +35,34 @@ class UserPostSerializer(serializers.ModelSerializer):
         read_only_fields = ('name',)
 
 
+class ChatUserSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    last_login = serializers.DateTimeField()
+    name = serializers.CharField()
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    phone = serializers.CharField
+    image = serializers.CharField
+    is_active = serializers.BooleanField()
+    description = serializers.CharField()
+    color = serializers.CharField()
+
+
+class ChatMessageSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    timestamp = serializers.DateTimeField()
+    content = serializers.CharField()
+    is_post = serializers.BooleanField()
+    user_id = serializers.IntegerField()
+    room_id = serializers.IntegerField()
+
+
+class ChatSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    user = ChatUserSerializer()
+    last_message = ChatMessageSerializer()
+
+
 class UserChattingSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     user = serializers.SerializerMethodField()
