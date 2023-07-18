@@ -78,11 +78,6 @@ class UserChattingSerializer(serializers.Serializer):
         ).data
         return a
 
-class UserUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User()
-        fields = ('username', 'email')
-
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -161,6 +156,24 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'color'
         ]
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+
+    image = serializers.ImageField(required=False)
+    name = serializers.CharField(required=False)
+    email = serializers.CharField(required=False)
+    username = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+
+    class Meta:
+        model = User()
+        fields = [
+            'id',
+            'name',
+            'email',
+            'image',
+            'username',
+            'description'
+        ]
 
 class FollowUserSerializer(serializers.ModelSerializer):
 
