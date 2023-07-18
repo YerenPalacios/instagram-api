@@ -6,8 +6,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model as User
 
+from chat.services.chat_service import ChatService
 from instagram_app.serializers.message import MessageSerializer
-from instagram_app.serializers.user import UserChattingSerializer
+from instagram_app.serializers.user import UserChattingSerializer, ChatSerializer
 
 
 class MessageView(ListCreateAPIView):
@@ -32,8 +33,9 @@ class MessageView(ListCreateAPIView):
 
 class ChatListView(ListCreateAPIView):
     queryset = ChatRoom.objects.all()
-    serializer_class = UserChattingSerializer
+    serializer_class = ChatSerializer
     permission_classes = (IsAuthenticated,)
+    service = ChatService()
 
     def create(self, request, *args, **kwargs):
         user = self.request.auth.user
@@ -52,11 +54,6 @@ class ChatListView(ListCreateAPIView):
 
         return Response({}, status=201)
 
-    def get(self, request):
-        rooms = self.get_queryset().annotate(
-            users_count=Count('users'),
-        ).filter(users_count=2, users=request.user)
-
-        data = self.serializer_class(rooms, many=True, context={
-                                     "user": request.user}).data
-        return Response(data)
+    def get(self, request, *args, **kwargs):
+        rooms = self.service.get_chat_rooms(request.user.id)
+        return Response(self.serializer_class(rooms, many=True).data)
