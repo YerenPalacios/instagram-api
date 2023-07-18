@@ -14,7 +14,7 @@ from django.db.models import Count
 from instagram_app.models import Follow, User
 from instagram_app.serializers import LoginSerializer, UserSerializer, ProfileStoriesSerializer
 from instagram_app.serializers.user import FollowUserSerializer, UserDetailSerializer, UserSignUpSerializer, \
-    UserExistsSerializer
+    UserExistsSerializer, UserUpdateSerializer
 from instagram_app.services.user_service import UserService
 
 
@@ -32,11 +32,15 @@ class UserView(ListCreateAPIView):
 
 
 class UserDetailView(RetrieveUpdateAPIView):
-    serializer_class = UserDetailSerializer
-    queryset = serializer_class.Meta.model.objects.annotate(
+    queryset = User.objects.annotate(
         posts_count=Count('post'),
     )
     lookup_field = 'username'
+
+    def get_serializer_class(self):
+        if self.request.method == 'PUT':
+            return UserUpdateSerializer
+        return UserDetailSerializer
 
 
 class UserSignupView(CreateAPIView):
@@ -63,7 +67,11 @@ class LoginView(GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = self.service.login(serializer.data)
+        user, token = self.service.login(serializer.data)
+        data = {
+            "user": UserSerializer(user, context={'request': request}).data,
+            "token": token.key
+        }
         return Response(data, status=201)
 
 

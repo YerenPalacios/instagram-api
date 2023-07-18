@@ -10,8 +10,7 @@ class UserService:
         self._repository = UserRepository()
 
     def login(self, data: dict) -> dict:
-        user, token = self._repository.get_token(data)
-        return {"user": UserSerializer(user).data, "token": token.key}
+        return self._repository.get_token(data)
 
     def get_users(self, data: dict = None, limit: int = None, auth_user_id: int = None):
         if data.get('search'):
