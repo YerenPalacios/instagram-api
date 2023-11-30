@@ -7,7 +7,7 @@ from instagram_app.models import Comment, Follow, Like, Message, Post, User, Fil
 
 # Register your models here.
 
-models = [Post, User, Like, Comment, Follow, Files, Message]
+models = [Like, Comment, Follow, Files, Message]
 
 admin.site.register(models)
 
@@ -15,8 +15,16 @@ admin.site.register(models)
 class PublicChatRoomAdmin(admin.ModelAdmin):
     list_display = ['id', 'title']
     search_fields = ['id', 'title']
-    list_display = ['id',]
 
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['user']
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    search_fields = ['name']
 
 
 class CachingPaginator(Paginator):
