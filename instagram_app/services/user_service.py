@@ -12,9 +12,11 @@ class UserService:
     def login(self, data: dict) -> dict:
         return self._repository.get_token(data)
 
-    def get_users(self, data: dict = None, limit: int = None, auth_user_id: int = None):
-        if data.get('search'):
-            return self._repository.get_users_by_name(data.get('search'), auth_user_id)
+    def get_users(self, params: dict = None, limit: int = None, auth_user_id: int = None):
+        if params.get('search'):
+            return self._repository.get_users_by_name(params.get('search'), auth_user_id)
+        if params.get('suggested'):
+            return self._repository.get_suggested_users(auth_user_id)
         users = self._repository.get_users(auth_user_id)
         if limit:
             return users[:limit]

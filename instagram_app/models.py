@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.fields.related import ForeignKey
 
+from instagram_app.dto.user import UserDTO
+
 
 class UserManager(BaseUserManager):
     def create_user(self, name, email, password=None):
@@ -44,6 +46,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.email}: {self.username}'
+
+    def to_dto(self) -> UserDTO:
+        return UserDTO(
+            id=self.id,
+            name=self.name,
+            username=self.username,
+            email=self.email,
+            phone=self.phone,
+            image=self.image.url if self.image else '',
+            is_active=self.is_active,
+            is_staff=self.is_staff,
+            description=self.description,
+            color=self.color,
+            is_following=getattr(self, "following", None)
+        )
 
 
 class Post(models.Model):

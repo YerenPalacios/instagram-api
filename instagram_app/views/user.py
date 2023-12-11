@@ -24,11 +24,8 @@ class UserView(ListCreateAPIView):
 
     def get_queryset(self):
         limit = self.request.GET.get('page_size')
-        return self.service.get_users(
-            self.request.GET,
-            int(limit) if limit else None,
-            self.request.auth.user.id if self.request.auth else None
-        )
+        return self.service.get_users(self.request.GET, int(limit) if limit else None,
+                                      self.request.auth.user.id if self.request.auth else None)
 
 
 class UserDetailView(RetrieveUpdateAPIView):
@@ -74,7 +71,7 @@ class LoginView(GenericAPIView):
         user, token = self.service.login(serializer.data)
         data = {
             "user": UserSerializer(user, context={'request': request}).data,
-            "token": token.key
+            "token": token
         }
         return Response(data, status=201)
 
