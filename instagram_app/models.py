@@ -59,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             is_staff=self.is_staff,
             description=self.description,
             color=self.color,
-            is_following=getattr(self, "following", None)
+            is_following=getattr(self, "is_following", None)
         )
 
 
