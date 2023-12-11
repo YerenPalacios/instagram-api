@@ -51,8 +51,12 @@ class UserSignupView(CreateAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid()
         user = self.service.create_user(serializer.data)
-        auth = self.service.login({'email': user.email, 'password': serializer.data.get("password")})
-        return Response(auth, status=201)
+        user, token = self.service.login({'email': user.email, 'password': serializer.data.get("password")})
+        data = {
+            "user": UserSerializer(user, context={'request': request}).data,
+            "token": token
+        }
+        return Response(data, status=201)
 
 
 class LoginView(GenericAPIView):
