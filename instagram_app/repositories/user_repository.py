@@ -65,3 +65,12 @@ class UserRepository:
         user.color = generate_random_color()
         user.save()
         return user
+
+    def get_suggested_users(self, user_id, limit=10):
+        return self.to_dto(self.get_users(user_id).exclude(id=user_id)[:limit])
+
+    @staticmethod
+    def to_dto(qs):
+        return [i.to_dto() for i in qs]
+
+
