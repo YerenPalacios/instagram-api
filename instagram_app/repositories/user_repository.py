@@ -21,7 +21,7 @@ class UserRepository:
     def get_token(self, data: dict) -> [User, Token]:
         user = self.authenticate(data)
         token, created = Token.objects.get_or_create(user=user)
-        return user, token
+        return user, token.key
 
     def get_current_user(self, key: str) -> User:
         token = Token.objects.filter(key=key)
