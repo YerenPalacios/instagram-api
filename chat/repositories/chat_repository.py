@@ -8,8 +8,8 @@ from instagram_app.models import User
 
 class ChatRepository:
     @staticmethod
-    def get_messages_by_room(room_id: int) -> QuerySet[ChatRoomMessage]:
-        return ChatRoomMessage.objects.filter(room_id=room_id)
+    def get_messages_by_room(room_id: int, limit: int) -> QuerySet[ChatRoomMessage]:
+        return ChatRoomMessage.objects.filter(room_id=room_id).order_by('-timestamp')[:limit]
 
     @staticmethod
     def create_message(user_id: int, room_id: int, content: str, **kwargs) -> ChatRoomMessage:

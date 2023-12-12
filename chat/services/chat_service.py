@@ -41,8 +41,8 @@ class ChatService:
         self.repository = ChatRepository()
         self.serializer = ChatRoomMessageSerializer
 
-    def get_messages_by_room(self, room_id: int) -> list:
-        messages = self.repository.get_messages_by_room(room_id)
+    def get_messages_by_room(self, room_id: int, limit=20) -> list:
+        messages = self.repository.get_messages_by_room(room_id, limit)
         return self.serializer(messages, many=True).data
 
     def create_message(self, user_id, room_id, content) -> dict:

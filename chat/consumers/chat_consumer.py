@@ -70,7 +70,7 @@ class ChatConsumer2(JsonWebsocketConsumer):
             )
 
             async_to_sync(self.channel_layer.group_send)(
-                self.chat_id, {"type": "add_message", "text": message}
+                self.chat_id, {"type": "add_message", "data": message}
             )
 
 
