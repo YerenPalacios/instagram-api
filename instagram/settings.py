@@ -179,6 +179,10 @@ REST_FRAMEWORK = {
     ]
 }
 
+# celery
+CELERY_BROKER_URL = env.str('CELERY_BROKER_REDIS_URL', 'redis://localhost:6379')
+
+
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
