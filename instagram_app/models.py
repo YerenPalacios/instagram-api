@@ -1,6 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.fields.related import ForeignKey
 
@@ -133,7 +132,7 @@ class Follow(models.Model):
 
 class PublicChatRoom(models.Model):
     title = models.CharField(max_length=255, unique=True, blank=False)
-    user = models.ManyToManyField(get_user_model(), blank=True)
+    user = models.ManyToManyField(User, blank=True)
 
     def connect_user(self, user):
         is_user_added = False
@@ -164,7 +163,7 @@ class PublicChatRoomMessageManager(models.Manager):
 
 
 class PublicChatRoomMessage(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(PublicChatRoom, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     content = models.TextField()

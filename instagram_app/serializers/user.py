@@ -1,9 +1,10 @@
 from django.core.validators import FileExtensionValidator
-from django.contrib.auth import get_user_model as User, authenticate
+from django.contrib.auth import authenticate
 from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from rest_framework import serializers
 from instagram_app.models import Follow
+from instagram_app.models import User
 
 from instagram_app.serializers.message import ChatRoomMessageSerializer
 from instagram_app.utils import generate_random_color
@@ -23,14 +24,14 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     class Meta:
-        model = User()
+        model = User
         exclude = ('user_permissions', 'groups', 'is_staff', 'password',)
         read_only_fields = ('name',)
 
 
 class UserPostSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User()
+        model = User
         fields = ['image', 'name', 'username', 'color']
         read_only_fields = ('name',)
 
@@ -87,12 +88,12 @@ class LoginSerializer(serializers.Serializer):
 class UserSignUpSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=30)
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User().objects.all())]
+        validators=[UniqueValidator(queryset=User.objects.all())]
     )
     username = serializers.CharField(
         min_length=4,
         max_length=20,
-        validators=[UniqueValidator(queryset=User().objects.all())]
+        validators=[UniqueValidator(queryset=User.objects.all())]
     )
 
     password = serializers.CharField(max_length=64)
@@ -113,13 +114,13 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         return user
 
     class Meta:
-        model = User()
+        model = User
         fields = '__all__'
 
 
 class ProfileStoriesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User()
+        model = User
         fields = ['id', 'username', 'image', 'color']
 
 
@@ -141,7 +142,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         ) else False
 
     class Meta:
-        model = User()
+        model = User
         fields = [
             'id',
             'name',
@@ -165,7 +166,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
 
     class Meta:
-        model = User()
+        model = User
         fields = [
             'id',
             'name',

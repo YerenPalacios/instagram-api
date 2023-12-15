@@ -10,6 +10,7 @@ services:
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
 
   redis:
     image: redis:latest
@@ -25,3 +26,15 @@ services:
     working_dir: /app
     depends_on:
       - redis
+  
+  app:
+    build:
+      context: .
+    command: 
+      - "./app.sh"
+    volumes: 
+      - ./:/app
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
