@@ -1,5 +1,14 @@
 version: "3.8"
 services:
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    command: daphne -b ${APP_HOST} -p ${APP_PORT} instagram.asgi:application
+    volumes:
+      - .:/app
+
   postgres:
     restart: always
     image: postgres:latest
